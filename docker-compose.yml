@@ -16,7 +16,7 @@ services:
       EMAIL_FROM: ${EMAIL_FROM:-otp@example.com}
       EMAIL_USERNAME: ${EMAIL_USERNAME:-}
       EMAIL_PASSWORD: ${EMAIL_PASSWORD:-}
-      SMPP_HOST: ${SMPP_HOST:-host.docker.internal}
+      SMPP_HOST: ${SMPP_HOST:-smppsim}
       SMPP_PORT: ${SMPP_PORT:-2775}
       SMPP_SYSTEM_ID: ${SMPP_SYSTEM_ID:-smppclient1}
       SMPP_PASSWORD: ${SMPP_PASSWORD:-password}
@@ -30,6 +30,8 @@ services:
       postgres:
         condition: service_healthy
       mailpit:
+        condition: service_started
+      smppsim:
         condition: service_started
 
   postgres:
@@ -53,6 +55,13 @@ services:
     ports:
       - "${MAILPIT_WEB_PORT:-8025}:8025"
       - "${MAILPIT_SMTP_PORT:-1025}:1025"
+
+  smppsim:
+    image: eagafonov/smppsim:latest
+    platform: linux/amd64
+    ports:
+      - "${SMPPSIM_PORT:-2775}:2775"
+      - "${SMPPSIM_WEB_PORT:-8088}:88"
 
 volumes:
   postgres_data:

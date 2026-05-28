@@ -14,8 +14,10 @@ make up
 - PostgreSQL 17 на `localhost:15432`
 - Mailpit SMTP на `localhost:1025`
 - Mailpit UI на `http://localhost:8025`
+- SMPPsim на `localhost:2775`
+- SMPPsim UI на `http://localhost:8088`
 
-Telegram использует внешний API и настраивается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID` в `.env`. SMPP рассчитан на локальный SMPPsim или совместимый эмулятор на `host.docker.internal:2775`.
+Telegram использует внешний API и настраивается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID` в `.env`.
 
 ## API
 
@@ -97,7 +99,16 @@ curl -X POST http://localhost:8080/api/otp/generate \
 
 Каналы: `FILE`, `EMAIL`, `SMS`, `TELEGRAM`.
 
-Для `FILE` код пишется в `otp-codes.txt` внутри рабочей директории контейнера. Для `EMAIL` письмо можно посмотреть в Mailpit UI. Для `SMS` нужен SMPP-эмулятор. Для `TELEGRAM` нужны реальные token/chat id.
+Для `FILE` код пишется в `otp-codes.txt` внутри рабочей директории контейнера. Для `EMAIL` письмо можно посмотреть в Mailpit UI. Для `SMS` используется SMPPsim из Docker Compose. Для `TELEGRAM` нужны реальные token/chat id.
+
+Пример генерации кода через SMPPsim:
+
+```bash
+curl -X POST http://localhost:8080/api/otp/generate \
+  -H "Authorization: Bearer <user-token>" \
+  -H 'Content-Type: application/json' \
+  -d '{"operationId":"payment-sms-100","channel":"SMS","destination":"79001234567"}'
+```
 
 Валидировать OTP:
 

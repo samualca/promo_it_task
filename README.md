@@ -19,6 +19,12 @@ make up
 
 Telegram использует внешний API и настраивается через `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID` в `.env`.
 
+По умолчанию Makefile использует `docker-compose`. Если в вашей системе установлен Compose как plugin-команда, можно запускать так:
+
+```bash
+make up COMPOSE="docker compose"
+```
+
 ## API
 
 Все ответы имеют вид:

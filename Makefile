@@ -1,14 +1,16 @@
+COMPOSE ?= docker-compose
+
 .PHONY: up down logs test package clean
 
 up:
 	cp -n .env.example .env || true
-	docker compose up --build
+	$(COMPOSE) up --build
 
 down:
-	docker compose down
+	$(COMPOSE) down
 
 logs:
-	docker compose logs -f app
+	$(COMPOSE) logs -f app
 
 test:
 	mvn test
@@ -17,5 +19,5 @@ package:
 	mvn -DskipTests package
 
 clean:
-	docker compose down -v
+	$(COMPOSE) down -v
 	mvn clean

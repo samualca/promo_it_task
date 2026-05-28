@@ -1,0 +1,58 @@
+services:
+  app:
+    build: .
+    environment:
+      APP_PORT: 8080
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-otp_service}
+      DB_USER: ${POSTGRES_USER:-otp_user}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-otp_password}
+      JWT_SECRET: ${JWT_SECRET:-replace-with-a-long-random-secret}
+      JWT_TTL_MINUTES: ${JWT_TTL_MINUTES:-60}
+      OTP_SWEEP_SECONDS: ${OTP_SWEEP_SECONDS:-30}
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_AUTH: ${SMTP_AUTH:-false}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-false}
+      EMAIL_FROM: ${EMAIL_FROM:-otp@example.com}
+      EMAIL_USERNAME: ${EMAIL_USERNAME:-}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD:-}
+      SMPP_HOST: ${SMPP_HOST:-host.docker.internal}
+      SMPP_PORT: ${SMPP_PORT:-2775}
+      SMPP_SYSTEM_ID: ${SMPP_SYSTEM_ID:-smppclient1}
+      SMPP_PASSWORD: ${SMPP_PASSWORD:-password}
+      SMPP_SYSTEM_TYPE: ${SMPP_SYSTEM_TYPE:-OTP}
+      SMPP_SOURCE_ADDR: ${SMPP_SOURCE_ADDR:-OTPService}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-otp_service}
+      POSTGRES_USER: ${POSTGRES_USER:-otp_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-otp_password}
+    ports:
+      - "${POSTGRES_PORT:-15432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-otp_user} -d ${POSTGRES_DB:-otp_service}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "${MAILPIT_WEB_PORT:-8025}:8025"
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+
+volumes:
+  postgres_data:

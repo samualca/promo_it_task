@@ -1,0 +1,7 @@
+.git
+.idea
+target
+.env
+otp-codes.txt
+*.iml
+.DS_Store
